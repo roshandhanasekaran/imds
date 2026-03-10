@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMDS — Intelligent Managed Data Services</title>
+    <style>
+        /* ===== CSS RESET & VARIABLES ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #6C3CE1;
+            --primary-light: #8B5CF6;
+            --primary-dark: #5129B0;
+            --accent: #00D4AA;
+            --accent-light: #34EDCA;
+            --bg-dark: #0B0F1A;
+            --bg-card: #131829;
+            --bg-card-hover: #1A2038;
+            --bg-surface: #0F1322;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border: #1E293B;
+            --gradient-hero: linear-gradient(135deg, #6C3CE1 0%, #00D4AA 100%);
+            --gradient-card: linear-gradient(135deg, rgba(108,60,225,0.1) 0%, rgba(0,212,170,0.05) 100%);
+            --shadow-lg: 0 25px 60px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 40px rgba(108,60,225,0.3);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; font-family: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; }
+
+        /* ===== UTILITY CLASSES ===== */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .section { padding: 100px 0; }
+        .section-label {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+        .text-center { text-align: center; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .grid { display: grid; gap: 24px; }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+        .flex { display: flex; align-items: center; }
+        .flex-between { display: flex; align-items: center; justify-content: space-between; }
+        .gap-8 { gap: 8px; }
+        .gap-12 { gap: 12px; }
+        .gap-16 { gap: 16px; }
+        .gap-24 { gap: 24px; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .btn:hover::after { opacity: 1; }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: var(--gradient-hero);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(108,60,225,0.4);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 8px 30px rgba(108,60,225,0.6);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1.5px solid var(--border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--primary-light);
+            background: rgba(108,60,225,0.1);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 10px 16px;
+        }
+        .btn-ghost:hover { color: var(--text-primary); }
+        .btn-accent {
+            background: var(--accent);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 20px rgba(0,212,170,0.3);
+        }
+        .btn-accent:hover {
+            background: var(--accent-light);
+            box-shadow: 0 8px 30px rgba(0,212,170,0.5);
+            transform: translateY(-2px);
+        }
+        .btn-sm { padding: 10px 20px; font-size: 14px; }
+        .btn-lg { padding: 18px 36px; font-size: 17px; }
+        .btn-icon {
+            width: 44px; height: 44px; padding: 0;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-icon:hover {
+            color: var(--primary-light);
+            border-color: var(--primary-light);
+            background: rgba(108,60,225,0.1);
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 0;
+            transition: var(--transition);
+            background: transparent;
+        }
+        .navbar.scrolled {
+            background: rgba(11,15,26,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+        }
+        .navbar .container { display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .nav-logo span { font-weight: 400; opacity: 0.7; }
+        .nav-links { display: flex; align-items: center; gap: 32px; }
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-hero);
+            transition: var(--transition);
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            padding: 8px;
+        }
+        .mobile-toggle span {
+            width: 24px; height: 2px;
+            background: var(--text-primary);
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(108,60,225,0.15) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite;
+        }
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0,212,170,0.1) 0%, transparent 70%);
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -40px); }
+        }
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        .hero-content { max-width: 580px; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(108,60,225,0.15);
+            border: 1px solid rgba(108,60,225,0.3);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-light);
+            margin-bottom: 28px;
+        }
+        .hero-badge .dot {
+            width: 8px; height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .hero h1 {
+            font-size: clamp(40px, 6vw, 64px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+        .hero h1 .gradient-text {
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+            line-height: 1.7;
+        }
+        .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 52px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+        .hero-stat h3 {
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-stat p { font-size: 14px; color: var(--text-muted); }
+
+        /* Hero visual / Dashboard preview */
+        .hero-visual {
+            position: relative;
+            perspective: 1200px;
+        }
+        .dashboard-preview {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            transform: rotateY(-5deg) rotateX(2deg);
+            transition: var(--transition);
+        }
+        .dashboard-preview:hover {
+            transform: rotateY(0deg) rotateX(0deg);
+        }
+        .dash-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .dash-dots { display: flex; gap: 6px; }
+        .dash-dots span {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+        .dash-dots span:nth-child(1) { background: #FF5F57; }
+        .dash-dots span:nth-child(2) { background: #FFBD2E; }
+        .dash-dots span:nth-child(3) { background: #28CA41; }
+        .dash-title { font-size: 13px; color: var(--text-muted); }
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .dash-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+        .dash-card-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+        .dash-card-value { font-size: 24px; font-weight: 700; }
+        .dash-card-change {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .dash-card-change.up { color: var(--accent); }
+        .dash-card-change.down { color: #FF5F57; }
+        .dash-chart {
+            grid-column: 1 / -1;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+            padding-top: 10px;
+        }
+        .chart-bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            background: var(--gradient-hero);
+            opacity: 0.7;
+            transition: var(--transition);
+            animation: growBar 1.5s ease-out forwards;
+        }
+        .chart-bar:hover { opacity: 1; }
+        @keyframes growBar {
+            from { height: 0; }
+        }
+
+        /* ===== LOGOS / TRUSTED BY ===== */
+        .logos-section {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .logos-section p {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        .logos-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            opacity: 0.4;
+        }
+        .logo-item {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        /* ===== FEATURES ===== */
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-hero);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: rgba(108,60,225,0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            background: var(--gradient-card);
+            border: 1px solid rgba(108,60,225,0.2);
+        }
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .feature-card p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-light);
+            transition: var(--transition);
+        }
+        .feature-link:hover { gap: 10px; color: var(--accent); }
+
+        /* ===== HOW IT WORKS ===== */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+        .step {
+            text-align: center;
+            position: relative;
+        }
+        .step-number {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--gradient-hero);
+            color: #fff;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 25px rgba(108,60,225,0.4);
+        }
+        .step h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .step p { font-size: 15px; color: var(--text-secondary); }
+
+        /* ===== PRICING ===== */
+        .pricing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 32px 0 48px;
+        }
+        .pricing-toggle span { font-size: 15px; color: var(--text-secondary); font-weight: 500; }
+        .pricing-toggle span.active { color: var(--text-primary); }
+        .toggle-switch {
+            width: 52px; height: 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            transition: var(--transition);
+        }
+        .toggle-switch.annual::after { left: 27px; }
+        .toggle-switch.annual { background: rgba(108,60,225,0.2); border-color: var(--primary-light); }
+
+        .pricing-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(108,60,225,0.3);
+        }
+        .pricing-card.popular {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-glow);
+            background: var(--gradient-card);
+        }
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-hero);
+            color: #fff;
+            padding: 4px 20px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .pricing-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .pricing-card .plan-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+        .pricing-card .price {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+        .pricing-card .price sup { font-size: 24px; vertical-align: super; }
+        .pricing-card .price-period { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+        .pricing-card ul { text-align: left; margin-bottom: 32px; }
+        .pricing-card li {
+            padding: 10px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .pricing-card li .check { color: var(--accent); font-weight: bold; }
+        .pricing-card .btn { width: 100%; }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: var(--transition);
+        }
+        .testimonial-card:hover {
+            border-color: rgba(108,60,225,0.3);
+            transform: translateY(-2px);
+        }
+        .testimonial-stars { color: #FBBF24; font-size: 16px; margin-bottom: 16px; letter-spacing: 2px; }
+        .testimonial-card blockquote {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+        .testimonial-author { display: flex; align-items: center; gap: 12px; }
+        .testimonial-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: var(--gradient-hero);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .testimonial-name { font-size: 15px; font-weight: 600; }
+        .testimonial-role { font-size: 13px; color: var(--text-muted); }
+
+        /* ===== INTEGRATIONS ===== */
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 48px;
+        }
+        .integration-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 16px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .integration-item:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .integration-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+        .integration-item span:last-child { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
+        /* ===== FAQ ===== */
+        .faq-list { max-width: 720px; margin: 48px auto 0; }
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .faq-item.active { border-color: rgba(108,60,225,0.3); }
+        .faq-question {
+            width: 100%;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 20px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        .faq-question:hover { background: var(--bg-card-hover); }
+        .faq-icon {
+            font-size: 20px;
+            transition: var(--transition);
+            color: var(--primary-light);
+        }
+        .faq-item.active .faq-icon { transform: rotate(45deg); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+        .faq-item.active .faq-answer { max-height: 200px; }
+        .faq-answer p {
+            padding: 0 24px 20px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-box {
+            background: var(--gradient-card);
+            border: 1px solid rgba(108,60,225,0.2);
+            border-radius: 24px;
+            padding: 80px 60px;
+            text-align: center;
+            position: relative;
+        }
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -100px; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(108,60,225,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .cta-box h2 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .cta-box p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+        .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 60px 0 32px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer-brand p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 16px 0 24px;
+            line-height: 1.7;
+        }
+        .footer-social { display: flex; gap: 8px; }
+        .footer h4 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+        .footer li { margin-bottom: 12px; }
+        .footer li a {
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        .footer li a:hover { color: var(--primary-light); }
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            max-width: 480px;
+            width: 90%;
+            transform: translateY(20px) scale(0.95);
+            transition: var(--transition);
+            position: relative;
+        }
+        .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            padding: 4px;
+            transition: var(--transition);
+        }
+        .modal-close:hover { color: var(--text-primary); }
+        .modal h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .modal p { font-size: 15px; color: var(--text-secondary); margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(108,60,225,0.15);
+        }
+        .form-input::placeholder { color: var(--text-muted); }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 20000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast-icon { font-size: 20px; color: var(--accent); }
+        .toast-msg { font-size: 14px; font-weight: 500; }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero .container { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .hero-content { max-width: 100%; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: flex; }
+            .hero-stats { gap: 24px; flex-wrap: wrap; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+            .pricing-cards { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+        }
+        @media (max-width: 480px) {
+            .section { padding: 60px 0; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .hero-actions { flex-direction: column; }
+            .hero-actions .btn { width: 100%; }
+        }
+
+        /* ===== MOBILE MENU ===== */
+        .mobile-menu {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border);
+            z-index: 9999;
+            padding: 80px 32px 32px;
+            transition: right 0.4s ease;
+        }
+        .mobile-menu.open { right: 0; }
+        .mobile-menu a {
+            display: block;
+            padding: 16px 0;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .mobile-menu a:hover { color: var(--primary-light); padding-left: 8px; }
+        .mobile-menu-close {
+            position: absolute;
+            top: 24px; right: 24px;
+            background: none;
+            color: var(--text-primary);
+            font-size: 28px;
+        }
+        .mobile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .mobile-overlay.open { opacity: 1; visibility: visible; }
+
+        /* ===== TABS (Features Section) ===== */
+        .feature-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 48px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .feature-tab {
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .feature-tab:hover { color: var(--text-primary); border-color: var(--primary-light); }
+        .feature-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* ===== COUNTER ANIMATION ===== */
+        .counter { display: inline-block; }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+    <div class="container">
+        <a href="#" class="nav-logo">IMDS<span>.io</span></a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn btn-ghost" onclick="openModal('login')">Log In</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('signup')">Start Free Trial</button>
+        </div>
+        <button class="mobile-toggle" onclick="toggleMobile()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobile()"></div>
+<div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="toggleMobile()">&times;</button>
+    <a href="#features" onclick="toggleMobile()">Features</a>
+    <a href="#how-it-works" onclick="toggleMobile()">How It Works</a>
+    <a href="#pricing" onclick="toggleMobile()">Pricing</a>
+    <a href="#testimonials" onclick="toggleMobile()">Testimonials</a>
+    <a href="#faq" onclick="toggleMobile()">FAQ</a>
+    <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn btn-secondary" onclick="openModal('login'); toggleMobile();">Log In</button>
+        <button class="btn btn-primary" onclick="openModal('signup'); toggleMobile();">Start Free Trial</button>
+    </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                Now with AI-Powered Analytics
+            </div>
+            <h1>Manage Your Data<br><span class="gradient-text">Intelligently.</span></h1>
+            <p>IMDS is the all-in-one platform that transforms how teams collect, analyze, and act on data. Automate workflows, get real-time insights, and scale effortlessly.</p>
+            <div class="hero-actions">
+                <button class="btn btn-primary btn-lg" onclick="openModal('signup')">
+                    Get Started Free
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="showToast('Demo video coming soon!')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                    Watch Demo
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <h3><span class="counter" data-target="10000">0</span>+</h3>
+                    <p>Active Users</p>
+                </div>
+                <div class="hero-stat">
+                    <h3><span class="counter" data-target="99.9">0</span>%</h3>
+                    <p>Uptime SLA</p>
+                </div>
+                <div class="hero-stat">
+                    <h3><span class="counter" data-target="500">0</span>M+</h3>
+                    <p>Data Points</p>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="dashboard-preview">
+                <div class="dash-header">
+                    <div class="dash-dots"><span></span><span></span><span></span></div>
+                    <span class="dash-title">Dashboard Overview</span>
+                </div>
+                <div class="dash-grid">
+                    <div class="dash-card">
+                        <div class="dash-card-label">Revenue</div>
+                        <div class="dash-card-value">$48.2K</div>
+                        <div class="dash-card-change up">+12.5%</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-card-label">Users</div>
+                        <div class="dash-card-value">2,847</div>
+                        <div class="dash-card-change up">+8.3%</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-card-label">Conversion</div>
+                        <div class="dash-card-value">3.24%</div>
+                        <div class="dash-card-change up">+2.1%</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-card-label">Bounce Rate</div>
+                        <div class="dash-card-value">24.1%</div>
+                        <div class="dash-card-change down">-5.4%</div>
+                    </div>
+                    <div class="dash-chart">
+                        <div class="dash-card-label">Weekly Performance</div>
+                        <div class="chart-bars">
+                            <div class="chart-bar" style="height: 45%"></div>
+                            <div class="chart-bar" style="height: 65%"></div>
+                            <div class="chart-bar" style="height: 50%"></div>
+                            <div class="chart-bar" style="height: 80%"></div>
+                            <div class="chart-bar" style="height: 60%"></div>
+                            <div class="chart-bar" style="height: 90%"></div>
+                            <div class="chart-bar" style="height: 75%"></div>
+                            <div class="chart-bar" style="height: 85%"></div>
+                            <div class="chart-bar" style="height: 55%"></div>
+                            <div class="chart-bar" style="height: 95%"></div>
+                            <div class="chart-bar" style="height: 70%"></div>
+                            <div class="chart-bar" style="height: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== TRUSTED BY ===== -->
+<section class="logos-section reveal">
+    <div class="container">
+        <p>Trusted by leading companies worldwide</p>
+        <div class="logos-row">
+            <span class="logo-item">Stripe</span>
+            <span class="logo-item">Shopify</span>
+            <span class="logo-item">Notion</span>
+            <span class="logo-item">Vercel</span>
+            <span class="logo-item">Figma</span>
+            <span class="logo-item">Linear</span>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="section" id="features">
+    <div class="container">
+        <div class="text-center reveal">
+            <span class="section-label">Features</span>
+            <h2 class="section-title">Everything you need to<br>manage data at scale</h2>
+            <p class="section-subtitle mx-auto">Powerful tools designed for modern teams. From real-time analytics to automated workflows.</p>
+        </div>
+
+        <div class="feature-tabs reveal" style="margin-top: 48px;">
+            <button class="feature-tab active" onclick="filterFeatures('all', this)">All Features</button>
+            <button class="feature-tab" onclick="filterFeatures('analytics', this)">Analytics</button>
+            <button class="feature-tab" onclick="filterFeatures('automation', this)">Automation</button>
+            <button class="feature-tab" onclick="filterFeatures('security', this)">Security</button>
+        </div>
+
+        <div class="grid grid-3 reveal" id="featuresGrid" style="margin-top: 16px;">
+            <div class="feature-card" data-category="analytics">
+                <div class="feature-icon">&#x1F4CA;</div>
+                <h3>Real-Time Analytics</h3>
+                <p>Monitor your metrics in real-time with beautiful dashboards. Get instant insights into user behavior, revenue, and growth.</p>
+                <a href="#" class="feature-link" onclick="showToast('Analytics docs loading...')">Learn more &rarr;</a>
+            </div>
+            <div class="feature-card" data-category="automation">
+                <div class="feature-icon">&#x26A1;</div>
+                <h3>Smart Automation</h3>
+                <p>Set up intelligent workflows that respond to data changes. Trigger actions automatically based on custom rules and conditions.</p>
+                <a href="#" class="feature-link" onclick="showToast('Automation guide loading...')">Learn more &rarr;</a>
+            </div>
+            <div class="feature-card" data-category="security">
+                <div class="feature-icon">&#x1F512;</div>
+                <h3>Enterprise Security</h3>
+                <p>SOC 2 Type II certified. End-to-end encryption, SSO, role-based access, and audit logs to keep your data safe.</p>
+                <a href="#" class="feature-link" onclick="showToast('Security whitepaper loading...')">Learn more &rarr;</a>
+            </div>
+            <div class="feature-card" data-category="analytics">
+                <div class="feature-icon">&#x1F916;</div>
+                <h3>AI-Powered Insights</h3>
+                <p>Our ML models surface anomalies and trends automatically. Get predictive analytics without any data science expertise.</p>
+                <a href="#" class="feature-link" onclick="showToast('AI features docs loading...')">Learn more &rarr;</a>
+            </div>
+            <div class="feature-card" data-category="automation">
+                <div class="feature-icon">&#x1F517;</div>
+                <h3>200+ Integrations</h3>
+                <p>Connect with your existing tools seamlessly. Slack, Salesforce, HubSpot, and hundreds more with one-click setup.</p>
+                <a href="#" class="feature-link" onclick="showToast('Integrations catalog loading...')">Learn more &rarr;</a>
+            </div>
+            <div class="feature-card" data-category="security">
+                <div class="feature-icon">&#x1F310;</div>
+                <h3>Global CDN</h3>
+                <p>Data served from 50+ edge locations worldwide. Sub-100ms response times for every user, regardless of location.</p>
+                <a href="#" class="feature-link" onclick="showToast('Infrastructure docs loading...')">Learn more &rarr;</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section" id="how-it-works" style="background: var(--bg-surface);">
+    <div class="container">
+        <div class="text-center reveal">
+            <span class="section-label">How It Works</span>
+            <h2 class="section-title">Up and running in minutes</h2>
+            <p class="section-subtitle mx-auto">Three simple steps to transform your data workflow.</p>
+        </div>
+        <div class="steps reveal">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Connect Your Data</h3>
+                <p>Link your databases, APIs, and tools with our secure connectors. No code required.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Configure & Customize</h3>
+                <p>Set up dashboards, alerts, and automations using our visual drag-and-drop builder.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Analyze & Act</h3>
+                <p>Get real-time insights and automate decisions. Scale confidently with enterprise-grade infrastructure.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="section" id="pricing">
+    <div class="container">
+        <div class="text-center reveal">
+            <span class="section-label">Pricing</span>
+            <h2 class="section-title">Simple, transparent pricing</h2>
+            <p class="section-subtitle mx-auto">No hidden fees. No surprises. Start free and scale as you grow.</p>
+        </div>
+        <div class="pricing-toggle reveal">
+            <span class="active" id="monthlyLabel">Monthly</span>
+            <div class="toggle-switch" id="pricingToggle" onclick="togglePricing()"></div>
+            <span id="annualLabel">Annual <span style="color: var(--accent); font-size: 12px; font-weight: 600;">Save 20%</span></span>
+        </div>
+        <div class="pricing-cards reveal">
+            <!-- Starter -->
+            <div class="pricing-card">
+                <h3>Starter</h3>
+                <p class="plan-desc">Perfect for individuals and small projects</p>
+                <div class="price"><sup>$</sup><span class="price-value" data-monthly="0" data-annual="0">0</span></div>
+                <p class="price-period">Free forever</p>
+                <ul>
+                    <li><span class="check">&#10003;</span> Up to 1,000 data points</li>
+                    <li><span class="check">&#10003;</span> 3 dashboards</li>
+                    <li><span class="check">&#10003;</span> Basic analytics</li>
+                    <li><span class="check">&#10003;</span> Email support</li>
+                    <li><span class="check">&#10003;</span> 1 team member</li>
+                </ul>
+                <button class="btn btn-secondary" onclick="openModal('signup')">Get Started</button>
+            </div>
+            <!-- Pro -->
+            <div class="pricing-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <h3>Professional</h3>
+                <p class="plan-desc">For growing teams and businesses</p>
+                <div class="price"><sup>$</sup><span class="price-value" data-monthly="49" data-annual="39">49</span></div>
+                <p class="price-period">per user / <span class="period-text">month</span></p>
+                <ul>
+                    <li><span class="check">&#10003;</span> Unlimited data points</li>
+                    <li><span class="check">&#10003;</span> Unlimited dashboards</li>
+                    <li><span class="check">&#10003;</span> Advanced analytics & AI</li>
+                    <li><span class="check">&#10003;</span> Priority support</li>
+                    <li><span class="check">&#10003;</span> Up to 25 team members</li>
+                    <li><span class="check">&#10003;</span> 100+ integrations</li>
+                </ul>
+                <button class="btn btn-primary" onclick="openModal('signup')">Start Free Trial</button>
+            </div>
+            <!-- Enterprise -->
+            <div class="pricing-card">
+                <h3>Enterprise</h3>
+                <p class="plan-desc">For large organizations with custom needs</p>
+                <div class="price" style="font-size: 36px; padding: 8px 0;">Custom</div>
+                <p class="price-period">Tailored to your needs</p>
+                <ul>
+                    <li><span class="check">&#10003;</span> Everything in Professional</li>
+                    <li><span class="check">&#10003;</span> Unlimited team members</li>
+                    <li><span class="check">&#10003;</span> SSO & SAML</li>
+                    <li><span class="check">&#10003;</span> Dedicated account manager</li>
+                    <li><span class="check">&#10003;</span> Custom SLA</li>
+                    <li><span class="check">&#10003;</span> On-premise deployment</li>
+                </ul>
+                <button class="btn btn-secondary" onclick="openModal('contact')">Contact Sales</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="section" id="testimonials" style="background: var(--bg-surface);">
+    <div class="container">
+        <div class="text-center reveal">
+            <span class="section-label">Testimonials</span>
+            <h2 class="section-title">Loved by teams worldwide</h2>
+            <p class="section-subtitle mx-auto">See what our customers have to say about transforming their data workflows.</p>
+        </div>
+        <div class="testimonials-grid reveal" style="margin-top: 48px;">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>"IMDS completely transformed how we handle analytics. We went from spending hours building reports to having real-time insights at our fingertips."</blockquote>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">SK</div>
+                    <div>
+                        <div class="testimonial-name">Sarah Kim</div>
+                        <div class="testimonial-role">VP of Engineering, TechFlow</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>"The automation features alone saved us 40+ hours per week. The AI insights helped us identify trends we never would have found manually."</blockquote>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">MR</div>
+                    <div>
+                        <div class="testimonial-name">Marcus Rodriguez</div>
+                        <div class="testimonial-role">Data Lead, ScaleUp Inc.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>"Best-in-class security combined with an incredibly intuitive UI. We migrated our entire data stack to IMDS and never looked back."</blockquote>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">AJ</div>
+                    <div>
+                        <div class="testimonial-name">Aisha Johnson</div>
+                        <div class="testimonial-role">CTO, FinanceHub</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== INTEGRATIONS ===== -->
+<section class="section" id="integrations">
+    <div class="container">
+        <div class="text-center reveal">
+            <span class="section-label">Integrations</span>
+            <h2 class="section-title">Works with your favorite tools</h2>
+            <p class="section-subtitle mx-auto">Connect IMDS with 200+ apps and services you already use.</p>
+        </div>
+        <div class="integrations-grid reveal">
+            <div class="integration-item" onclick="showToast('Slack integration ready!')">
+                <span class="integration-icon">&#x1F4AC;</span>
+                <span>Slack</span>
+            </div>
+            <div class="integration-item" onclick="showToast('GitHub integration ready!')">
+                <span class="integration-icon">&#x1F431;</span>
+                <span>GitHub</span>
+            </div>
+            <div class="integration-item" onclick="showToast('Stripe integration ready!')">
+                <span class="integration-icon">&#x1F4B3;</span>
+                <span>Stripe</span>
+            </div>
+            <div class="integration-item" onclick="showToast('Salesforce integration ready!')">
+                <span class="integration-icon">&#x2601;</span>
+                <span>Salesforce</span>
+            </div>
+            <div class="integration-item" onclick="showToast('HubSpot integration ready!')">
+                <span class="integration-icon">&#x1F4E7;</span>
+                <span>HubSpot</span>
+            </div>
+            <div class="integration-item" onclick="showToast('Jira integration ready!')">
+                <span class="integration-icon">&#x1F4CB;</span>
+                <span>Jira</span>
+            </div>
+            <div class="integration-item" onclick="showToast('Notion integration ready!')">
+                <span class="integration-icon">&#x1F4DD;</span>
+                <span>Notion</span>
+            </div>
+            <div class="integration-item" onclick="showToast('Zapier integration ready!')">
+                <span class="integration-icon">&#x26A1;</span>
+                <span>Zapier</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="section" id="faq" style="background: var(--bg-surface);">
+    <div class="container">
+        <div class="text-center reveal">
+            <span class="section-label">FAQ</span>
+            <h2 class="section-title">Frequently asked questions</h2>
+            <p class="section-subtitle mx-auto">Everything you need to know about IMDS.</p>
+        </div>
+        <div class="faq-list reveal">
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    How does the free trial work?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Start with a 14-day free trial of our Professional plan. No credit card required. You get full access to all features, and can downgrade to our free Starter plan at any time.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Can I switch plans at any time?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Absolutely! You can upgrade or downgrade your plan at any time. When upgrading, you'll be prorated for the remainder of your billing cycle. Downgrades take effect at the end of your current period.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    What security certifications do you have?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>We are SOC 2 Type II certified, GDPR compliant, and HIPAA eligible. All data is encrypted at rest and in transit using AES-256 encryption. We undergo annual third-party security audits.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Do you offer on-premise deployment?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes! Our Enterprise plan includes the option for on-premise deployment. This is ideal for organizations with strict data residency requirements. Contact our sales team for a custom setup.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    What kind of support do you offer?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Starter plans get email support (24hr response). Professional plans include priority email and chat support (4hr response). Enterprise customers get a dedicated account manager and 24/7 phone support.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-box reveal">
+            <h2>Ready to transform<br>your data workflow?</h2>
+            <p>Join 10,000+ teams already using IMDS to make smarter, data-driven decisions.</p>
+            <div class="cta-actions">
+                <button class="btn btn-primary btn-lg" onclick="openModal('signup')">Start Your Free Trial</button>
+                <button class="btn btn-secondary btn-lg" onclick="openModal('contact')">Talk to Sales</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="nav-logo">IMDS<span>.io</span></a>
+                <p>Intelligent Managed Data Services. The modern platform for data-driven teams.</p>
+                <div class="footer-social">
+                    <button class="btn-icon" onclick="showToast('Opening Twitter...')">&#x1D54F;</button>
+                    <button class="btn-icon" onclick="showToast('Opening LinkedIn...')">in</button>
+                    <button class="btn-icon" onclick="showToast('Opening GitHub...')">&#x2687;</button>
+                </div>
+            </div>
+            <div>
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#features" onclick="showToast('Navigating to Features')">Features</a></li>
+                    <li><a href="#pricing" onclick="showToast('Navigating to Pricing')">Pricing</a></li>
+                    <li><a href="#integrations" onclick="showToast('Navigating to Integrations')">Integrations</a></li>
+                    <li><a href="#" onclick="showToast('Changelog coming soon!')">Changelog</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#" onclick="showToast('About page coming soon!')">About</a></li>
+                    <li><a href="#" onclick="showToast('Blog coming soon!')">Blog</a></li>
+                    <li><a href="#" onclick="showToast('Careers page coming soon!')">Careers</a></li>
+                    <li><a href="#" onclick="showToast('Press page coming soon!')">Press</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#" onclick="showToast('Documentation loading...')">Documentation</a></li>
+                    <li><a href="#" onclick="showToast('API Reference loading...')">API Reference</a></li>
+                    <li><a href="#" onclick="showToast('Status page loading...')">Status</a></li>
+                    <li><a href="#" onclick="showToast('Support center loading...')">Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 IMDS. All rights reserved.</span>
+            <div class="flex gap-24">
+                <a href="#" onclick="showToast('Privacy policy loading...')">Privacy Policy</a>
+                <a href="#" onclick="showToast('Terms loading...')">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== MODALS ===== -->
+<!-- Sign Up Modal -->
+<div class="modal-overlay" id="signupModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('signup')">&times;</button>
+        <h2>Start Your Free Trial</h2>
+        <p>No credit card required. Get started in 30 seconds.</p>
+        <form onsubmit="handleSignup(event)">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" class="form-input" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+                <label>Work Email</label>
+                <input type="email" class="form-input" placeholder="john@company.com" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-input" placeholder="Min. 8 characters" required minlength="8">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Create Account</button>
+        </form>
+        <p style="text-align: center; margin-top: 16px; margin-bottom: 0; font-size: 13px;">
+            Already have an account? <a href="#" style="color: var(--primary-light); font-weight: 600;" onclick="closeModal('signup'); openModal('login');">Log in</a>
+        </p>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('login')">&times;</button>
+        <h2>Welcome Back</h2>
+        <p>Log in to your IMDS dashboard.</p>
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-input" placeholder="john@company.com" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-input" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Log In</button>
+        </form>
+        <p style="text-align: center; margin-top: 16px; margin-bottom: 0; font-size: 13px;">
+            Don't have an account? <a href="#" style="color: var(--primary-light); font-weight: 600;" onclick="closeModal('login'); openModal('signup');">Sign up free</a>
+        </p>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal-overlay" id="contactModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('contact')">&times;</button>
+        <h2>Contact Sales</h2>
+        <p>Tell us about your needs and we'll get back within 24 hours.</p>
+        <form onsubmit="handleContact(event)">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" class="form-input" placeholder="Jane Smith" required>
+            </div>
+            <div class="form-group">
+                <label>Work Email</label>
+                <input type="email" class="form-input" placeholder="jane@enterprise.com" required>
+            </div>
+            <div class="form-group">
+                <label>Company Size</label>
+                <select class="form-input" required>
+                    <option value="">Select team size</option>
+                    <option>1-50 employees</option>
+                    <option>51-200 employees</option>
+                    <option>201-1000 employees</option>
+                    <option>1000+ employees</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea class="form-input" rows="3" placeholder="Tell us about your data needs..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 8px;">Send Message</button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast">
+    <span class="toast-icon">&#10003;</span>
+    <span class="toast-msg" id="toastMsg"></span>
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+    // ---- Navbar scroll effect ----
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // ---- Mobile menu ----
+    function toggleMobile() {
+        document.getElementById('mobileMenu').classList.toggle('open');
+        document.getElementById('mobileOverlay').classList.toggle('open');
+    }
+
+    // ---- Modal system ----
+    function openModal(type) {
+        document.getElementById(type + 'Modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(type) {
+        document.getElementById(type + 'Modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+    // Close modal on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.active').forEach(m => {
+                m.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+    });
+
+    // ---- Form handlers ----
+    function handleSignup(e) {
+        e.preventDefault();
+        closeModal('signup');
+        showToast('Account created successfully! Welcome to IMDS.');
+    }
+    function handleLogin(e) {
+        e.preventDefault();
+        closeModal('login');
+        showToast('Logged in successfully! Redirecting to dashboard...');
+    }
+    function handleContact(e) {
+        e.preventDefault();
+        closeModal('contact');
+        showToast('Message sent! Our team will reach out within 24 hours.');
+    }
+
+    // ---- Toast notifications ----
+    let toastTimeout;
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ---- Pricing toggle ----
+    let isAnnual = false;
+    function togglePricing() {
+        isAnnual = !isAnnual;
+        const toggle = document.getElementById('pricingToggle');
+        const monthly = document.getElementById('monthlyLabel');
+        const annual = document.getElementById('annualLabel');
+        toggle.classList.toggle('annual', isAnnual);
+        monthly.classList.toggle('active', !isAnnual);
+        annual.classList.toggle('active', isAnnual);
+
+        document.querySelectorAll('.price-value').forEach(el => {
+            const val = isAnnual ? el.dataset.annual : el.dataset.monthly;
+            animateValue(el, parseInt(el.textContent) || 0, parseInt(val), 400);
+        });
+        document.querySelectorAll('.period-text').forEach(el => {
+            el.textContent = isAnnual ? 'month (billed annually)' : 'month';
+        });
+    }
+    function animateValue(el, start, end, duration) {
+        const range = end - start;
+        const startTime = performance.now();
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(start + range * eased);
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    // ---- Feature tab filter ----
+    function filterFeatures(category, btn) {
+        document.querySelectorAll('.feature-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            if (category === 'all' || card.dataset.category === category) {
+                card.style.display = '';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // ---- FAQ accordion ----
+    function toggleFAQ(btn) {
+        const item = btn.parentElement;
+        const wasActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+        if (!wasActive) item.classList.add('active');
+    }
+
+    // ---- Scroll reveal animation ----
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ---- Counter animation ----
+    function animateCounters() {
+        document.querySelectorAll('.counter').forEach(counter => {
+            const target = parseFloat(counter.dataset.target);
+            const duration = 2000;
+            const startTime = performance.now();
+            const isFloat = target % 1 !== 0;
+
+            function update(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 4);
+                const current = eased * target;
+                counter.textContent = isFloat ? current.toFixed(1) : Math.round(current).toLocaleString();
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        });
+    }
+
+    // Start counters when hero section is visible
+    const heroObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounters();
+                heroObserver.disconnect();
+            }
+        });
+    }, { threshold: 0.3 });
+    heroObserver.observe(document.getElementById('hero'));
+
+    // ---- Smooth scroll for anchor links ----
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href !== '#') {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
